@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metode Numerik</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <h1>Mencari Akar menggunakan Newton-Raphson</h1>
+                <div id="plot"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function f(x){
+            return Math.pow(x,3) - 6*Math.pow(x,2) + 11*x - 6;
+        }
+
+        function fprime(x){
+            return 3*Math.pow(x,2) - 12*x + 11;
+        }
+
+        function newtonRaphson(initialguess, tol=0.0001, maxiteration=9999){
+            let x0 = initialguess;
+            let iteration = 0;
+
+            while (Math.abs(f(x0)) > tol && iteration < maxiteration){
+                x0 = x0 - f(x0) / fprime(x0);
+                iteration++;
+            }
+
+            if(iteration === maxiteration){
+                return null;
+            } else {
+                return x0;
+            }
+        }
+
+        let x_values = [];
+        let y_values = [];
+
+        for (let x = -2; x <= 4; x += 0.01){
+            x_values.push(x);
+            y_values.push(f(x));
+        }
+
+        let initialguess = 2;
+        let root = newtonRaphson(initialguess);
+
+        let data = [{
+            x: x_values,
+            y: y_values,
+            mode: 'lines',
+            name: 'f(x) = x^3 - 6x^2 + 11x - 6'
+        }];
+
+        if(root !== null){
+            data.push({
+                x: [root],
+                y: [f(root)],
+                mode: "markers",
+                marker:{
+                    color: 'blue',
+                    size: 10
+                },
+                name: 'Akar yang ditemukan'
+            });
+        }
+
+        let layout = {
+            title: 'Grafik fungsi dan akar dengan metode Newton-Raphson',
+            xaxis: {
+                title: 'x'
+            },
+            yaxis: {
+                title: 'f(x)'
+            }
+        };
+
+        Plotly.newPlot('plot', data, layout);
+
+        if (root !== null){
+            console.log("Akar yang ditemukan:", root.toFixed(6));
+        } else {
+            console.log("Akar yang ditemukan dalam iterasi maksimum!");
+        }
+    </script>
+</body>
+</html>
